@@ -4,7 +4,7 @@ import json
 import bottle_pgsql
 from bottle import Bottle, route, run, static_file, error, response
 
-app = bottle.Bottle()
+app = Bottle()
 plugin = bottle_pgsql.Plugin(os.environ.get('DATABASE_URL', ''))
 app.install(plugin)
 

@@ -36,7 +36,8 @@ def emit_request(query, offset=0):
         }
 
 
-def convert(query, offset=0): data = emit_request(query, offset)
+def convert(query, offset=0):
+    data = emit_request(query, offset)
     def _convert(p):
         ret = {
             key: p[key] for key in ['content', 'owner_id', 'plurk_id', 'porn']

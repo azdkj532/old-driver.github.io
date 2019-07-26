@@ -29,7 +29,10 @@ def emit_request(query, offset=0):
     if resp.status == 200:
         return json.loads(content)
     else:
-        return []
+        return {
+            'last_offset': -1,
+            'plurks': []
+        }
 
 
 def convert(query, offset=0):
@@ -48,22 +51,16 @@ def convert(query, offset=0):
 
 def search(query):
     offset = 0
-    while True:
+    while 0 <= offset < 800:
         data = convert(query, offset)
         if len(data['plurks']) > 0:
             offset = data['last_offset']
             yield from data['plurks']
 
 def run():
-    counter = 0
     for plurk in search('FF'):
         if not plurk['porn']:
             continue
-        else:
-            counter += 1
-
-        if counter > 200:
-            break
 
         q = app.db.session.query(app.Plurk).filter(app.Plurk.id == plurk['plurk_id'])
         if app.db.session.query(q.exists()):

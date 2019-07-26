@@ -55,11 +55,16 @@ def search(query):
             yield from data['plurks']
 
 def run():
+    counter = 0
     for plurk in search('FF'):
         if not plurk['porn']:
             continue
+        else:
+            counter += 1
 
-        print('<plurk id: {}>'.format(plurk['plurk_id']))
+        if counter > 200:
+            break
+
         app.db.session.add(
             app.Plurk(
                 id=plurk['plurk_id'],

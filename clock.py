@@ -41,7 +41,7 @@ def convert(query, offset=0):
         ret['avatar'] = data['users'].get(p['owner_id'])
         return ret
     return {
-        'last_offset': data['last_offset'],
+        'last_offset': int(data['last_offset']),
         'plurks': [ _convert(p) for p in data['plurks'] ]
     }
 

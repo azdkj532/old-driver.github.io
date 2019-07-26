@@ -5,3 +5,4 @@ flask_script
 flask_migrate
 psycopg2-binary
 gunicorn
+oauth2

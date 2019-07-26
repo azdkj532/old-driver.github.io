@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['CSRF_ENABLED'] = True
-app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
@@ -15,10 +15,15 @@ class Plurk(db.Model):
     __tablename__ = 'plurks'
 
     id = db.Column(db.Integer, primary_key=True)
+    author = db.Column(db.Integer)
+    author_avatar = db.Column(db.Integer)
     content = db.Column(db.String())
 
-    def __init__(self, content):
+    def __init__(self, id, author, author_avatar,content):
 
+        self.id = id
+        self.author = author
+        self.author_avatar = author_avatar
         self.content = content
 
     def serialize(self):

@@ -65,8 +65,8 @@ def run():
         if counter > 200:
             break
 
-        q = session.query(app.Plurk).filter(app.Plurk.id == plurk['id'])
-        if not session.query(q.exists()):
+        q = app.db.session.query(app.Plurk).filter(app.Plurk.id == plurk['plurk_id'])
+        if not app.db.session.query(q.exists()):
             continue
 
         app.db.session.add(

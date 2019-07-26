@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, request, jsonify, render_template, url_for
+from flask import Flask, jsonify, render_template, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -31,33 +31,29 @@ class Plurk(db.Model):
 @app.route('/')
 def index():
     return render_template('index.html',
-                           background=url_for('static', filename='background.png'))
+                           background=url_for('static',
+                                              filename='background.png'))
 
 
-@app.route('/go')
-def data(offset, db):
+@app.route('/go', defaults={'p': 0}, methods=['GET'])
+def go(p):
     try:
-        offset = int(offset)
+        p = int(p)
     except Exception:
-        offset = 0
-    row = db.execute('SELECT * FROM plurk LIMIT 50 OFFSET %s', (offset,))
+        p = 0
 
-    response.set_header('Content-Type', 'application/json')
-    if row:
-        return json.dumps(row)
-    else:
-        return []
+    result = Plurk.query.order_by(Plurk.id.desc()).paginate(
+        page=p, per_page=50, error_out=False)
+    return jsonify({'data': [row.serialize() for row in result.items]})
 
 
 @app.errorhandler(404)
 def error404(error):
     return '<h1>車速過快 翻車了</h1>'
 
-if os.environ.get('APP_LOCATION') == 'heroku':
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-else:
-    app.run(host='localhost', port=8080, debug=True)
-
 
 if __name__ == '__main__':
-    app.run()
+    if os.environ.get('APP_LOCATION') == 'heroku':
+        app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    else:
+        app.run(host='localhost', port=8080, debug=True)

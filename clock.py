@@ -66,7 +66,7 @@ def run():
             break
 
         q = app.db.session.query(app.Plurk).filter(app.Plurk.id == plurk['plurk_id'])
-        if not app.db.session.query(q.exists()):
+        if app.db.session.query(q.exists()):
             continue
 
         app.db.session.add(

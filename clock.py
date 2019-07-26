@@ -1,6 +1,7 @@
 import os
 import json
 from time import sleep
+from urllib.parse import urlencode
 
 import oauth2
 import app
@@ -19,17 +20,19 @@ def emit_request(query, offset=0):
     apiUrl = 'https://www.plurk.com/APP/PlurkSearch/search'
     payload = {
         'query': query,
-        'offset': offset,
+        'offset': int(offset),
         'time': 2019
     }
     resp, content = client.request(
         apiUrl,
         method='POST',
-        body='&'.join(f'{key}={val}' for key, val in payload.items()))
+        body=urlencode(payload)
+    )
 
     if resp.status == 200:
         return json.loads(content)
     else:
+        print('Got response header: {}'.format(resp.status))
         return {
             'last_offset': -1,
             'plurks': []
@@ -57,12 +60,15 @@ def search(query):
         if len(data['plurks']) > 0:
             offset = data['last_offset']
             yield from data['plurks']
+        else:
+            return
 
 def run():
     for plurk in search(PLURK_SEARCH_QUERY):
         if not plurk['porn']:
             continue
 
+        print(plurk['plurk_id'])
         q = app.db.session.query(app.Plurk).filter(app.Plurk.id == plurk['plurk_id'])
         if app.db.session.query(q.exists()):
             continue

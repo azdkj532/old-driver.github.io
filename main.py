@@ -4,14 +4,8 @@ import json
 import bottle_pgsql
 from bottle import Bottle, route, run, static_file, error, response
 
-db = {
-    'name': os.get('DB_NAME', ''),
-    'user': os.get('DB_USER', ''),
-    'pass': os.get('DB_PASS', ''),
-}
-
 app = bottle.Bottle()
-plugin = bottle_pgsql.Plugin('dbname={name} user={user} password={pass}'.format(**db))
+plugin = bottle_pgsql.Plugin(os.environ.get('DATABASE_URL', ''))
 app.install(plugin)
 
 @app.route('/')

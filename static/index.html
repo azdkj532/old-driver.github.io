@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>18 Lane</title>
+  <style>
+    * {
+      font-size: 13px;
+    }
+    
+    body, div, article, section, header, footer {
+      -webkit-box-sizing: border-box;
+         -moz-box-sizing: border-box;
+              box-sizing: border-box;
+    }
+    
+    body {
+      margin: 0 auto;
+    }
+    
+    #lane {
+      width: 100%;
+      height: 720px;
+      background: repeat-x center/contain url("./static/background.png");
+      overflow: hidden;
+    }
+    
+    .car {
+      position: absolute;
+      background: #FFF;
+      width: 16em;
+      height: 3em;
+      overflow: hidden;
+    }
+    
+    .car[data-status=stop] {
+      width: 24em;
+      height: auto;
+    }
+    
+    .car>* {
+      display: inline-block;
+      min-height: 100%;
+      vertical-align: top;
+      padding: 0.2em 0.4em;
+    }
+    
+    .car>.driver>.name {
+      margin-right: 0.5em;
+    }
+    
+    .car>.driver>.qualifier {
+      background: #AAA;
+      border-radius: 0.4em;
+      padding: 0 0.4em;
+    }
+    
+    @keyframes departure {
+      from {
+        left: 100%;
+        display: block;
+      }
+      to {
+        left: -20em;
+        display: block;
+      }
+    }
+    
+    @keyframes drive {
+      to {
+        left: -20em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header></header>
+  <div id="lane"></div>
+  <footer></footer>
+  <script type="text/javascript">
+    /* Mock data */
+    var data = [];
+    for (var i = 0; i < 10; i++) {
+      data.push({
+        'id': 'car-' + i,
+        'driver': {
+          'name': 'AARRR',
+          'qualifier': 'says',
+        },
+        'cargo': 'Stuff Stuff Stuff Stuff Stuff Stuff Stuff Stuff Stuff Stuff Stuff Stuff Stuff Stuff Stuff Stuff Stuff Stuff Stuff Stuff Stuff',
+      });
+    }
+  
+    /* Selectors */
+    const $ = s => document.querySelector(s);
+    const $$ = s => document.querySelectorAll(s);
+    
+    /* Build a car and put it onto the lane */
+    const buildCar = payload => {
+      /* Car element */
+      var car = document.createElement('article');
+      car.className = 'car';
+      car.id = payload.id;
+      car.setAttribute('data-status', 'departure');
+      
+      /* Block of driver */
+      var driver = document.createElement('section');
+      driver.className = 'driver';
+      
+      /* Text span of driver's name */
+      var name = document.createElement('span');
+      name.className = 'name';
+      var nameText = document.createTextNode(payload.driver.name);
+      name.appendChild(nameText);
+      
+      /* Text span of driver's qualifier */
+      var qualifier = document.createElement('span');
+      qualifier.className = 'qualifier';
+      var qualifierText = document.createTextNode(payload.driver.qualifier);
+      qualifier.appendChild(qualifierText);
+      
+      /* Put name and qualifier into block of driver */
+      driver.appendChild(name);
+      driver.appendChild(qualifier);
+      
+      /* Block of cargo */
+      var cargo = document.createElement('cargo');
+      cargo.className = 'cargo';
+      var cargoText = document.createTextNode(payload.cargo);
+      cargo.appendChild(cargoText);
+      
+      /* Put driver and cargo into car element */
+      car.appendChild(driver);
+      car.appendChild(cargo);
+      
+      /* Put car element onto lane */
+      $('#lane').appendChild(car);
+      resizeCargo(car);
+      
+      return car;
+    };
+    
+    /* Adjust the size of cargo after toggling */
+    const resizeCargo = car => {
+      var w = car.offsetWidth - car.querySelector('.driver').offsetWidth - 12;
+      car.querySelector('.cargo').style.width = w + 'px';
+    }
+    
+    /* Check if the car is moving (departure or driving) */
+    const isMoving = car => car.getAttribute('data-status') !== 'stop';
+    
+    /* Departure the car initially */
+    const departure = (car, posY, delay) => {
+      car.style.top = posY + 'px';
+      var sec = $('#lane').offsetWidth / 48;
+      car.style.animation = 'departure ' + sec + 's linear ' + delay + 's backwards';
+    }
+    
+    /* Drive the car after the first boarding */
+    const drive = car => {
+      car.setAttribute('data-status', 'driving');
+      var sec = car.offsetLeft / 48;
+      car.style.animation = 'drive ' + sec + 's linear';
+    };
+    
+    /* Enter the car and stop it */
+    const board = car => {
+      /* Fix the position */
+      car.style.left = car.offsetLeft + 'px';
+      car.style.top = car.offsetTop + 'px';
+      
+      /* Change the style */
+      car.setAttribute('data-status', 'stop');
+      resizeCargo(car);
+      
+      /* Stop moving */
+      car.style.animation = '';
+    }
+    
+    /* Leave the car and return to general style */
+    const drop = car => {
+      /* Change the style */
+      car.setAttribute('data-status', 'driving');
+      resizeCargo(car);
+    }
+    
+    /* Click event listener */
+    const listenCarClickEvent = (ev) => {
+      var car = ev.currentTarget;
+      if (isMoving(car)) {
+        board(car);
+      } else {
+        drop(car);
+        drive(car);
+      }
+    }
+    
+    window.addEventListener('load', () => {
+      /* Generate the cars using the data */
+      data.forEach(payload => {
+        var car = buildCar(payload);
+        
+        /* Click event for boarding and dropping */
+        car.addEventListener('click', listenCarClickEvent);
+        
+        /* Remove the car after the animation is finished */
+        car.addEventListener('animationend', ev => {
+          $('#lane').removeChild(ev.currentTarget);
+        });
+        
+        /* Random the number of vertical position and delay time*/
+        var posY =  Math.random() * ($('#lane').offsetHeight - 48);
+        var delay = Math.max(Math.random() * 10 - 2, 0);
+        
+        /* Departure the car */
+        departure(car, posY, delay);
+      });
+    });
+  </script>
+</body>
+</html>

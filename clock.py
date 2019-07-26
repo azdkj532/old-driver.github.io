@@ -9,6 +9,7 @@ PLURK_APP_KEY = os.environ.get('PLURK_APP_KEY')
 PLURK_APP_SECRET = os.environ.get('PLURK_APP_SECRET')
 PLURK_TOKEN = os.environ.get('PLURK_TOKEN')
 PLURK_SECRET = os.environ.get('PLURK_SECRET')
+PLURK_SEARCH_QUERY = os.environ.get('PLURK_SEARCH_QUERY', 'FF')
 
 consumer = oauth2.Consumer(PLURK_APP_KEY, PLURK_APP_SECRET)
 token = oauth2.Token(PLURK_TOKEN, PLURK_SECRET)
@@ -35,8 +36,7 @@ def emit_request(query, offset=0):
         }
 
 
-def convert(query, offset=0):
-    data = emit_request(query, offset)
+def convert(query, offset=0): data = emit_request(query, offset)
     def _convert(p):
         ret = {
             key: p[key] for key in ['content', 'owner_id', 'plurk_id', 'porn']
@@ -58,7 +58,7 @@ def search(query):
             yield from data['plurks']
 
 def run():
-    for plurk in search('FF'):
+    for plurk in search(PLURK_SEARCH_QUERY):
         if not plurk['porn']:
             continue
 

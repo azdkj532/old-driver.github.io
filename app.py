@@ -1,19 +1,20 @@
 import os
-import json
 
-import bottle_pgsql
-from bottle import Bottle, route, run, static_file, error, response
+from flask import Flask, request, jsonify
+from flask_sqlalchemy import SQLAlchemy
 
-app = Bottle()
-plugin = bottle_pgsql.Plugin(os.environ.get('DATABASE_URL', ''))
-app.install(plugin)
+app = Flask(
+    name=__name__,
+    static_url='/static',
+    static_folder='./static'
+)
+db = SQLAlchemy(app)
 
-@app.route('/')
+@app.route('/', defaults={'path': 'index.html'})
 @app.route('/static/<filename:path>')
-def index(filename=None):
-    if filename is None:
-        filename = 'index.html'
-    return static_file(filename, root='./static')
+def index(filename):
+    return app.send_static_file(filename)
+
 
 @app.route('/go')
 def data(offset, db):

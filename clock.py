@@ -6,7 +6,7 @@ from urllib.parse import urlencode
 import sys
 
 import oauth2
-import app
+from app import db, Plurk
 
 PLURK_APP_KEY = os.environ.get('PLURK_APP_KEY')
 PLURK_APP_SECRET = os.environ.get('PLURK_APP_SECRET')
@@ -36,24 +36,27 @@ def emit_request(query, offset=0):
         print('Got response header: {}'.format(resp.status))
         return {
             'last_offset': -1,
-            'plurks': []
-            'users': {}
+            'plurks': [],
+            'users': {},
         }
 
 
 def convert(query, offset=0):
     data = emit_request(query, offset)
     def _convert(p):
-        ret = {
-            key: p[key] for key in ['content', 'owner_id', 'plurk_id', 'porn']
-        }
-        user = data['users'].get(p['owner_id'])
-        ret['avatar'] = user['avatar']
-        ret['author'] = user['display_name']
-        return ret
+        try:
+            ret = {
+                key: p[key] for key in ['content', 'owner_id', 'plurk_id', 'porn']
+            }
+            user = data['users'].get(str(p['owner_id']))
+            ret['avatar'] = user['avatar']
+            ret['author'] = user['display_name']
+            return ret
+        except:
+            pass
     return {
         'last_offset': int(data['last_offset']),
-        'plurks': [ _convert(p) for p in data['plurks'] ]
+        'plurks': list(filter(None, (_convert(p) for p in data['plurks'] )))
     }
 
 
@@ -82,10 +85,15 @@ if __name__ == '__main__':
         if not plurk['porn']:
             continue
 
-        print(plurk['plurk_id'])
         try:
-            app.db.session.add(
-                app.Plurk(
+            instance = db.session.query(Plurk).filter(Plurk.id == plurk['plurk_id']).first()
+            instance.author=plurk['owner_id'],
+            instance.author_name=plurk['author'],
+            instance.author_avatar=plurk['avatar'],
+            instance.content=plurk['content']
+        except Exception:
+            db.session.add(
+                Plurk(
                     id=plurk['plurk_id'],
                     author=plurk['owner_id'],
                     author_name=plurk['author'],
@@ -93,6 +101,5 @@ if __name__ == '__main__':
                     content=plurk['content']
                 )
             )
-            app.db.session.commit()
-        except Exception:
-            break
+        db.session.flush()
+        db.session.commit()

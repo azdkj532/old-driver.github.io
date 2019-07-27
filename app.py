@@ -32,11 +32,11 @@ class Plurk(db.Model):
     author_avatar = db.Column(db.Integer)
     content = db.Column(db.String())
 
-    def __init__(self, id, author, author_avatar, name, content):
+    def __init__(self, id, author, author_avatar, author_name, content):
 
         self.id = id
         self.author = author
-        self.author_name = name
+        self.author_name = author_name
         self.author_avatar = author_avatar
         self.content = content
 

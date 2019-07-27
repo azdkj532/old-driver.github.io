@@ -37,6 +37,7 @@ def emit_request(query, offset=0):
         return {
             'last_offset': -1,
             'plurks': []
+            'users': {}
         }
 
 
@@ -46,7 +47,9 @@ def convert(query, offset=0):
         ret = {
             key: p[key] for key in ['content', 'owner_id', 'plurk_id', 'porn']
         }
-        ret['avatar'] = data['users'].get(p['owner_id'])
+        user = data['users'].get(p['owner_id'])
+        ret['avatar'] = user['avatar']
+        ret['author'] = user['display_name']
         return ret
     return {
         'last_offset': int(data['last_offset']),
@@ -85,6 +88,7 @@ if __name__ == '__main__':
                 app.Plurk(
                     id=plurk['plurk_id'],
                     author=plurk['owner_id'],
+                    author_name=plurk['author'],
                     author_avatar=plurk['avatar'],
                     content=plurk['content']
                 )

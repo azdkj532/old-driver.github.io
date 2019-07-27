@@ -28,13 +28,15 @@ class Plurk(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     author = db.Column(db.Integer)
+    author_name = db.Column(db.String())
     author_avatar = db.Column(db.Integer)
     content = db.Column(db.String())
 
-    def __init__(self, id, author, author_avatar,content):
+    def __init__(self, id, author, author_avatar, name, content):
 
         self.id = id
         self.author = author
+        self.author_name = name
         self.author_avatar = author_avatar
         self.content = content
 
@@ -42,6 +44,8 @@ class Plurk(db.Model):
         return {
             'id': self.id,
             'content': self.content,
+            'author': self.author_name,
+            'author_link': f'https://avatars.plurk.com/{self.author}-medium{self.author_avatar or ""}.gif',
             'link': 'https://www.plurk.com/p/{}'.format(base36_encode(self.id)),
         }
 

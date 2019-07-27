@@ -11,14 +11,14 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
 
 
-CHARS62 = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+CHARS62 = '0123456789abcdefghijklmnopqrstuvwxyz'
 
-def base62_encode(integer):
+def base36_encode(integer):
     integer = int(integer)
     seq = []
     while integer != 0:
-        seq.append(CHARS62[integer % 62])
-        integer //= 62
+        seq.append(CHARS62[integer % 36])
+        integer //= 36
     seq.reverse()
     return ''.join(seq)
 
@@ -42,8 +42,7 @@ class Plurk(db.Model):
         return {
             'id': self.id,
             'content': self.content,
-            'avatar': f'https://avatars.plurk.com/{self.author}-medium.gif',
-            'link': 'https://www.plurk.com/p/{}'.format(base62_encode(self.id)),
+            'link': 'https://www.plurk.com/p/{}'.format(base36_encode(self.id)),
         }
 
 

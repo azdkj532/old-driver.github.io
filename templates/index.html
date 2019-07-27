@@ -31,11 +31,13 @@
       width: 16em;
       height: 3em;
       overflow: hidden;
+      animation: departure 10s linear backwards;
     }
     
     .car[data-status=stop] {
       width: 24em;
       height: auto;
+      animation-play-state: paused;
     }
     
     .car>* {
@@ -58,15 +60,7 @@
     @keyframes departure {
       from {
         left: 100%;
-        display: block;
       }
-      to {
-        left: -20em;
-        display: block;
-      }
-    }
-    
-    @keyframes drive {
       to {
         left: -20em;
       }
@@ -133,35 +127,25 @@
       car.querySelector('.cargo').style.width = w + 'px';
     }
     
-    /* Check if the car is moving (departure or driving) */
+    /* Check if the car is moving */
     const isMoving = car => car.getAttribute('data-status') !== 'stop';
     
     /* Departure the car initially */
     const departure = (car, posY, delay) => {
       car.style.top = posY + 'px';
-      var sec = $('#lane').offsetWidth / 48;
-      car.style.animation = 'departure ' + sec + 's linear ' + delay + 's backwards';
+      car.style.animationDelay = delay + 's'; // dynamic value of delay time
     }
     
     /* Drive the car after the first boarding */
     const drive = car => {
       car.setAttribute('data-status', 'driving');
-      var sec = car.offsetLeft / 48;
-      car.style.animation = 'drive ' + sec + 's linear';
     };
     
     /* Enter the car and stop it */
     const board = car => {
-      /* Fix the position */
-      car.style.left = car.offsetLeft + 'px';
-      car.style.top = car.offsetTop + 'px';
-      
-      /* Change the style */
+      /* Change the style and stop the car */
       car.setAttribute('data-status', 'stop');
       resizeCargo(car);
-      
-      /* Stop moving */
-      car.style.animation = '';
     }
     
     /* Go to the brave new world */

@@ -77,6 +77,9 @@ if __name__ == '__main__':
     parser.add_argument('--max', default=10,
                         help='maximum result output')
     parser.add_argument('query', help='search query')
+    parser.add_argument('--insert-only', default=False, const=True,
+                        action='store_const',
+                        help='stop when duplicate')
     args = parser.parse_args()
 
     print(f'Get Query: {args.query}')
@@ -87,6 +90,10 @@ if __name__ == '__main__':
 
         try:
             instance = db.session.query(Plurk).filter(Plurk.id == plurk['plurk_id']).first()
+
+            if args.insert_only:
+                break
+
             instance.author=plurk['owner_id'],
             instance.author_name=plurk['author'],
             instance.author_avatar=plurk['avatar'],

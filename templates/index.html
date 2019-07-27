@@ -173,39 +173,58 @@
       }
     }
     
+    const setUp = (plurk, base, shift) => {
+      var car = buildCar({
+        cargo: plurk.content,
+        driver: {
+          name: plurk.author,
+          qualifier: ':',
+          avatar: plurk.author_link,
+        },
+        plurk: plurk.link,
+      });
+      
+      /* Click event for boarding and dropping */
+      car.addEventListener('click', listenCarClickEvent);
+      
+      /* Remove the car after the animation is finished */
+      car.addEventListener('animationend', ev => {
+        $('#lane').removeChild(ev.currentTarget);
+      });
+      
+      /* Random the number of vertical position and delay time*/
+      var posY =  Math.random() * ($('#lane').offsetHeight - 48);
+      var delay = Math.max(Math.random() * base - shift, 0);
+      
+      /* Departure the car */
+      departure(car, posY, delay);
+    }
+    
     window.addEventListener('load', () => {
-      /* Generate the cars using the data */
-      fetch('/go')
+      var interval = 40;
+      var shift = 5;
+      
+      /* The first batch of cars */
+      fetch('/go?p=1')
         .then(resp => resp.json())
         .then(results => results['data'])
         .then(results => {
-          results.forEach(plurk => {
-            var car = buildCar({
-              cargo: plurk.content,
-              driver: {
-                name: plurk.author,
-                qualifier: ':',
-		avatar: plurk.author_link,
-              },
-	      plurk: plurk.link
+          results.forEach(plurk => setUp(plurk, interval, shift));
+        });
+      
+      /* The following cars */
+      var iter = 2;
+      var clock = setInterval(() => {
+          fetch('/go?p=' + iter)
+            .then(resp => resp.json())
+            .then(results => results['data'])
+            .then(results => {
+              results.forEach(plurk => setUp(plurk, interval, 0));
             });
-
-            /* Click event for boarding and dropping */
-            car.addEventListener('click', listenCarClickEvent);
-
-            /* Remove the car after the animation is finished */
-            car.addEventListener('animationend', ev => {
-              $('#lane').removeChild(ev.currentTarget);
-            });
-
-            /* Random the number of vertical position and delay time*/
-            var posY =  Math.random() * ($('#lane').offsetHeight - 48);
-            var delay = Math.max(Math.random() * 10 - 2, 0);
-
-            /* Departure the car */
-            departure(car, posY, delay);
-        })
-      });
+          iter++;
+        },
+        (interval - shift) * 1000,
+      );
     });
   </script>
 </body>

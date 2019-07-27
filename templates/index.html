@@ -89,6 +89,7 @@
       car.className = 'car';
       car.id = payload.id;
       car.setAttribute('data-status', 'departure');
+      car.setAttribute('data-url', payload.plurk);
       
       /* Block of driver */
       var driver = document.createElement('section');
@@ -163,6 +164,12 @@
       car.style.animation = '';
     }
     
+    /* Go to the brave new world */
+    const braveNewWorld = car => {
+      var url = car.getAttribute('data-url');
+      window.open(url, '_blank')
+    }
+    
     /* Leave the car and return to general style */
     const drop = car => {
       /* Change the style */
@@ -171,10 +178,11 @@
     }
     
     /* Click event listener */
-    const listenCarClickEvent = (ev) => {
+    const listenCarClickEvent = ev => {
       var car = ev.currentTarget;
       if (isMoving(car)) {
         board(car);
+        braveNewWorld(car);
       } else {
         drop(car);
         drive(car);

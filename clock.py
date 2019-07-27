@@ -12,7 +12,6 @@ PLURK_APP_KEY = os.environ.get('PLURK_APP_KEY')
 PLURK_APP_SECRET = os.environ.get('PLURK_APP_SECRET')
 PLURK_TOKEN = os.environ.get('PLURK_TOKEN')
 PLURK_SECRET = os.environ.get('PLURK_SECRET')
-PLURK_SEARCH_QUERY = os.environ.get('PLURK_SEARCH_QUERY', 'FF')
 
 consumer = oauth2.Consumer(PLURK_APP_KEY, PLURK_APP_SECRET)
 token = oauth2.Token(PLURK_TOKEN, PLURK_SECRET)
@@ -74,10 +73,9 @@ if __name__ == '__main__':
     parser.add_argument('query', help='search query')
     args = parser.parse_args()
 
-    query = args.query or PLURK_SEARCH_QUERY
-    print(f'Get Query: {query}')
+    print(f'Get Query: {args.query}')
 
-    for plurk in search(query):
+    for plurk in search(args.query):
         if not plurk['porn']:
             continue
 

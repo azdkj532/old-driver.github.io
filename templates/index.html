@@ -126,8 +126,7 @@
       /* Block of cargo */
       var cargo = document.createElement('cargo');
       cargo.className = 'cargo';
-      var cargoText = document.createTextNode(payload.cargo);
-      cargo.appendChild(cargoText);
+      cargo.innerHTML = payload.cargo;
       
       /* Put driver and cargo into car element */
       car.appendChild(driver);

@@ -1,7 +1,9 @@
 import os
 import json
+import argparse
 from time import sleep
 from urllib.parse import urlencode
+import sys
 
 import oauth2
 import app
@@ -63,13 +65,23 @@ def search(query):
         else:
             return
 
-def run():
-    for plurk in search(PLURK_SEARCH_QUERY):
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('--max', default=10,
+                        help='maximum result output')
+    parser.add_argument('query', help='search query')
+    args = parser.parse_args()
+
+    query = args.query or PLURK_SEARCH_QUERY
+    print(f'Get Query: {query}')
+
+    for plurk in search(query):
         if not plurk['porn']:
             continue
 
         print(plurk['plurk_id'])
-
         try:
             app.db.session.add(
                 app.Plurk(
@@ -82,7 +94,3 @@ def run():
             app.db.session.commit()
         except Exception:
             break
-
-
-if __name__ == '__main__':
-    run()

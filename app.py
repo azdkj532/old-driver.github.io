@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, jsonify, render_template, url_for
+from flask import Flask, jsonify, render_template, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -57,10 +57,10 @@ def index():
                                               filename='background.png'))
 
 
-@app.route('/go', defaults={'p': 0}, methods=['GET'])
-def go(p):
+@app.route('/go', methods=['GET'])
+def go():
     try:
-        p = int(p)
+        p = int(request.args.get('p', 0))
     except Exception:
         p = 0
 

@@ -205,9 +205,11 @@
             var car = buildCar({
               cargo: plurk.content,
               driver: {
-                name: 'Test',
+                name: plurk.author,
                 qualifier: ':',
-              }
+		avatar: plurk.author_link,
+              },
+	      plurk: plurk.link
             });
 
             /* Click event for boarding and dropping */

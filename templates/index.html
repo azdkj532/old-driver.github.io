@@ -197,23 +197,34 @@
     
     window.addEventListener('load', () => {
       /* Generate the cars using the data */
-      data.forEach(payload => {
-        var car = buildCar(payload);
-        
-        /* Click event for boarding and dropping */
-        car.addEventListener('click', listenCarClickEvent);
-        
-        /* Remove the car after the animation is finished */
-        car.addEventListener('animationend', ev => {
-          $('#lane').removeChild(ev.currentTarget);
-        });
-        
-        /* Random the number of vertical position and delay time*/
-        var posY =  Math.random() * ($('#lane').offsetHeight - 48);
-        var delay = Math.max(Math.random() * 10 - 2, 0);
-        
-        /* Departure the car */
-        departure(car, posY, delay);
+      fetch('/go')
+        .then(resp => resp.json())
+        .then(results => results['data'])
+        .then(results => {
+          results.forEach(plurk => {
+            var car = buildCar({
+              cargo: plurk.content,
+              driver: {
+                name: 'Test',
+                qualifier: ':',
+              }
+            });
+
+            /* Click event for boarding and dropping */
+            car.addEventListener('click', listenCarClickEvent);
+
+            /* Remove the car after the animation is finished */
+            car.addEventListener('animationend', ev => {
+              $('#lane').removeChild(ev.currentTarget);
+            });
+
+            /* Random the number of vertical position and delay time*/
+            var posY =  Math.random() * ($('#lane').offsetHeight - 48);
+            var delay = Math.max(Math.random() * 10 - 2, 0);
+
+            /* Departure the car */
+            departure(car, posY, delay);
+        })
       });
     });
   </script>

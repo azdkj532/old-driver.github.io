@@ -69,19 +69,19 @@ def run():
             continue
 
         print(plurk['plurk_id'])
-        q = app.db.session.query(app.Plurk).filter(app.Plurk.id == plurk['plurk_id'])
-        if app.db.session.query(q.exists()):
-            continue
 
-        app.db.session.add(
-            app.Plurk(
-                id=plurk['plurk_id'],
-                author=plurk['owner_id'],
-                author_avatar=plurk['avatar'],
-                content=plurk['content']
+        try:
+            app.db.session.add(
+                app.Plurk(
+                    id=plurk['plurk_id'],
+                    author=plurk['owner_id'],
+                    author_avatar=plurk['avatar'],
+                    content=plurk['content']
+                )
             )
-        )
-        app.db.session.commit()
+            app.db.session.commit()
+        except Exception:
+            break
 
 
 if __name__ == '__main__':

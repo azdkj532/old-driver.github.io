@@ -122,6 +122,11 @@
       $('#lane').appendChild(car);
       resizeCargo(car);
       
+      /* Disable the feature of opening the images in the cargo */
+      cargo.querySelectorAll('a.pictureservices').forEach(a => {
+        a.removeAttribute('href');
+      });
+      
       return car;
     };
     

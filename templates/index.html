@@ -21,6 +21,7 @@
     }
     
     #lane {
+      position: relative;
       width: 100%;
       height: 720px;
       background: repeat-x center/contain url("{{background}}");
@@ -62,10 +63,6 @@
     @keyframes departure {
       from {
         left: 100%;
-        display: none;
-      }
-      1% {
-        display: block;
       }
       to {
         left: -20em;

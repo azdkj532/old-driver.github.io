@@ -44,34 +44,74 @@
     
     .car {
       position: absolute;
-      background: #FFF;
+      background: #FF9A75;
       width: 16em;
-      height: 3em;
-      overflow: hidden;
+      height: 6em;
       animation: departure 10s linear backwards;
     }
     
+    .car::before, .car::after {
+      content: '';
+      display: block;
+      width: 3em;
+      height: 3em;
+      border-radius: 1.5em;
+      background: #333;
+      position: absolute;
+      z-index: 0;
+      bottom: -1.5em;
+    }
+    
+    .car::before {
+      left: 2em;
+    }
+    
+    .car::after {
+      right: 2em;
+    }
+    
     .car[data-status=stop] {
-      width: 24em;
+      width: 28em;
       height: auto;
+      z-index: 10;
       animation-play-state: paused;
     }
     
-    .car>* {
+    .car>.container {
+      width: 100%;
+      height: 4em;
+      overflow: hidden;
+      background: #FFF;
+    }
+    
+    .car[data-status=stop]>.container {
+      height: auto;
+      margin: auto auto 2em auto;
+    }
+    
+    .car>.container>* {
       display: inline-block;
       min-height: 100%;
       vertical-align: top;
+    }
+    
+    .car>.container>.driver {
       padding: 0.2em 0.4em;
     }
     
-    .car>.driver>.name {
-      margin-right: 0.5em;
+    .car>.container>.driver>.name {
+      margin-right: 0.2em;
     }
     
-    .car>.driver>.qualifier {
-      background: #AAA;
+    .car>.container>.driver>.qualifier {
+      background: #FF9A75;
+      color: #FFF;
       border-radius: 0.4em;
       padding: 0 0.4em;
+    }
+    
+    .car>.container>.cargo {
+      padding: 0.2em 0.4em 0.2em 0;
     }
     
     @keyframes departure {
@@ -106,6 +146,10 @@
       car.setAttribute('data-status', 'departure');
       car.setAttribute('data-url', payload.plurk);
       
+      /* Container */
+      var container = document.createElement('section');
+      container.className = 'container';
+      
       /* Block of driver */
       var driver = document.createElement('section');
       driver.className = 'driver';
@@ -131,9 +175,11 @@
       cargo.className = 'cargo';
       cargo.innerHTML = payload.cargo;
       
-      /* Put driver and cargo into car element */
-      car.appendChild(driver);
-      car.appendChild(cargo);
+      /* Put driver and cargo into container */
+      container.appendChild(driver);
+      container.appendChild(cargo);
+      
+      car.append(container);
       
       /* Put car element onto lane */
       $('#lane').appendChild(car);

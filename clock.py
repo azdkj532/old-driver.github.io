@@ -90,6 +90,7 @@ if __name__ == '__main__':
 
         try:
             instance = db.session.query(Plurk).filter(Plurk.id == plurk['plurk_id']).first()
+            assert instance is not None
 
             if args.insert_only:
                 break
